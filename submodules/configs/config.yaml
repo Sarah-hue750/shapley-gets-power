@@ -1,0 +1,119 @@
+# SPDX-FileCopyrightText: : 2017-2024 The PyPSA-Eur Authors
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#top-level-configuration
+version: 0.11.0
+tutorial: false
+
+# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#scenario
+# Wildcard docs in https://pypsa-eur.readthedocs.io/en/latest/wildcards.html
+scenario:
+  ll:
+  - copt #v1.0
+  clusters:
+  - 600 #3000 # max. no. # change for a different spatial resolution
+  # opts:
+  - 'Co2L0.6'
+  - 'Co2L0.5'
+  - 'Co2L0.4'
+  - 'Co2L0.3'
+  - 'Co2L0.2'
+  - 'Co2L0.1'
+  - 'Co2L0.05'
+  - 'Co2L0.0'
+
+
+
+
+# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#enable
+enable:
+  retrieve: false
+  prepare_links_p_nom: false
+  retrieve_databundle: true #
+  retrieve_cost_data: true #
+  build_cutout: false
+  retrieve_cutout: true
+  custom_busmap: false
+  drop_leap_day: false
+
+
+# # docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#lines
+lines:
+  s_max_pu: 0.7 #Correction factor for line capacities (s_nom) to approximate N-1 security and reserve capacity
+
+
+# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#electricity
+electricity:
+  extendable_carriers:
+    Generator: [solar, solar-hsat, onwind, offwind-ac, offwind-dc, offwind-float]
+    StorageUnit: [battery, H2]
+    Store: [] # battery, H2
+
+  powerplants_filter: DateOut >= 2024 and not Fueltype.isin(['Nuclear', 'Hard Coal', 'Lignite'])
+  custom_powerplants: DateIn <= 2024 and DateOut >= 2024
+
+  conventional_carriers: [nuclear, oil, OCGT, CCGT, coal, lignite, geothermal, biomass]
+  renewable_carriers: [solar, solar-hsat, onwind, offwind-ac, offwind-dc, offwind-float, hydro]
+
+# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#energy
+energy:
+  energy_totals_year: 2013
+  base_emissions_year: 1990
+  emissions: CO2
+
+# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#clustering
+clustering:
+
+  focus_weights:
+  #   # All GB synch buses: 495.55555555555554
+  #   # 'GB':  0.8071748878923767
+  #   # 'IE':  0.09282511210762331
+
+  #   # All Scandic synch buses: 556.6666666666666
+  #   'SE':  0.38443113772455095
+  #   'NO':  0.307185628742515
+  #   'FI':  0.12574850299401197
+  #   'DK':  0.08263473053892215
+
+    # All CE synch buses: 4875.555555555556
+    'AL':  0.005948040109389244
+    'AT':  0.016203281677301735
+    'BA':  0.006358249772105742
+    'BE':  0.013947128532360986
+    'BG':  0.012101185050136737
+    'CH':  0.03773928896991796
+    'CZ':  0.01640838650865998
+    'DE':  0.1232680036463081
+    'ES':  0.227461257976299
+    'FR':  0.18931175934366454
+    'GR':  0.006973564266180493
+    'HR':  0.005537830446672744
+    'HU':  0.010255241567912488
+    'IT':  0.07240200546946217
+    'LU':  0.0028714676390154967
+    'ME':  0.002666362807657247
+    'MK':  0.0012306289881494985
+    'NL':  0.008614402917046491
+    'PL':  0.043892433910665454
+    'PT':  0.04676390154968095
+    'RO':  0.02686873290793072
+    'RS':  0.011075660893345487
+    'SI':  0.0032816773017319964
+    'SK':  0.008819507748404742
+
+  simplify_network:
+    to_substations: false
+  cluster_network: 
+    algorithm: modularity
+  temporal:
+    resolution_elec: 3H # change for a different temporal resolution
+
+# docs in https://pypsa-eur.readthedocs.io/en/latest/configuration.html#solving
+solving:
+  options:
+    assign_all_duals: true
+    # ResultFile: model.ilp
+
+mattermost:
+  url: "https://iffchat.fz-juelich.de/hooks/gtf8xyaz1i8tmeb66t14h66cdc"

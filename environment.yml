@@ -1,0 +1,19 @@
+name: shapley-gets-power
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pypsa==0.29.0 
+  - matplotlib
+  - pandas
+  - numpy
+  - ipykernel
+  - ipympl
+  - jupyterlab
+  - scipy
+  - pip
+  - cartopy
+  - networkx
+  - seaborn
+  - shap
+
