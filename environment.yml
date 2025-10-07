@@ -2,18 +2,18 @@ name: shapley-gets-power
 channels:
   - conda-forge
 dependencies:
-  - python=3.11
+  - python=3.11.13
   - pypsa==0.29.0 
-  - matplotlib
-  - pandas
-  - numpy
-  - ipykernel
-  - ipympl
-  - jupyterlab
-  - scipy
-  - pip
-  - cartopy
-  - networkx
-  - seaborn
-  - shap
+  - matplotlib==3.10.3
+  - pandas==2.3.0
+  - numpy==1.26.4
+  - ipykernel==6.29.5
+  - ipympl==0.9.7
+  - jupyterlab==4.4.3
+  - scipy==1.15.2
+  - pip==25.1.1
+  - cartopy==0.24.0
+  - networkx==3.5
+  - seaborn==0.13.2
+  - shap==0.48.0
 
