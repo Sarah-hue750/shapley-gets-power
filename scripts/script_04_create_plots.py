@@ -5,7 +5,6 @@ import pickle as pkl
 import warnings
 
 
-
 # --- Numerical Libraries ---
 import numpy as np
 import matplotlib.pyplot as plt
@@ -63,18 +62,15 @@ from utils.calculate_shap import (
 from scripts.script_03_find_application import load_quadruple_cases_csv
 
 # --- Warnings ---
-warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action="ignore", category=FutureWarning)
 
 SYNC_GRID = "Scandinavia"  # Great_Britain, Scandinavia or Continental_Europe
 SAVE_FILE_BRAESS = braess_path + f"braess_paradox_cases.csv"
 SAVE_FILE_APPLICATIONS = application_path + f"application_cases.csv"
 
 
-
-
-
-
 ##### Plotting functions #####
+
 
 def motivational_plot(
     G_0,
@@ -86,12 +82,11 @@ def motivational_plot(
     label_offset_orig,
     ax_orig_aspect,
     ax_map_aspect,
-    save_folder = plots_path,
-    cmap = get_cmap("cividis"),
-    cmap_delta = get_cmap("coolwarm"),
+    save_folder=plots_path,
+    cmap=get_cmap("cividis"),
+    cmap_delta=get_cmap("coolwarm"),
     attr="del_flow",
-    NODE_ATTRS = {"node_color": "grey", "node_size": 50}, 
-    
+    NODE_ATTRS={"node_color": "grey", "node_size": 50},
 ):
     """
     Create a motivational plot showing the flow network and the effects of removing specific edges.
@@ -126,18 +121,14 @@ def motivational_plot(
         ax.set_yticks([])
         # ax.set_aspect(1.5)  # Set aspect ratio to auto for all axes
 
-
-
     # export data from G_multi_data
     P = G_multi_data["P"]
     I_m = G_multi_data["I_m"].item()
     B_d = G_multi_data["B_d"].item()
-    
-    
+
     # subgraph with only edges of interest
     G_0_small = G_0.subgraph(node_labels).copy()
 
-    
     #  removed cases
     G_e = get_flownetwork_without_lines(G_0, P, [rem_edges[0]])
     G_l = get_flownetwork_without_lines(G_0, P, [rem_edges[1]])
@@ -188,11 +179,11 @@ def motivational_plot(
     )  # Controls when to switch to sci notation
     cbar_map.update_ticks()
     if attr_map == "flow":
-        cbar_map.set_label(r"Flow (MW)", rotation=90, labelpad=5)
+        cbar_map.set_label(r"Flow (MW)", rotation=90, labelpad=5, fontsize=14)
     elif attr_map == "current":
-        cbar_map.set_label(r"Current (kA)", rotation=90, labelpad=5)
+        cbar_map.set_label(r"Current (kA)", rotation=90, labelpad=5, fontsize=14)
     elif attr_map == "load":
-        cbar_map.set_label(r"load (\\%)", rotation=90, labelpad=5)
+        cbar_map.set_label(r"load (\\%)", rotation=90, labelpad=5, fontsize=14)
     # Custom ticks
 
     if attr_map == "flow":
@@ -210,7 +201,7 @@ def motivational_plot(
 
         # Set ticks and labels on colorbar
         cbar_map.set_ticks(ticks)
-        cbar_map.set_ticklabels(labels)
+        cbar_map.set_ticklabels(labels, fontsize=14)
     cbar_map.ax.yaxis.set_ticks_position("left")
     cbar_map.ax.yaxis.set_label_position("left")
 
@@ -223,6 +214,7 @@ def motivational_plot(
         node_kw={"node_color": "grey", "node_size": 2},
         padding=0,
         attr=attr_map,
+        fontsize=14,
     )
     # add country borders
     ax_map.add_feature(cfeature.BORDERS, linestyle="-", linewidth=0.5)
@@ -241,6 +233,7 @@ def motivational_plot(
         label_offset=label_offset_orig,
         G_big=G_0,
         attr=attr_map,
+        fontsize=14,
     )
 
     ## Draw changed graphs and shapley attributions
@@ -296,6 +289,7 @@ def motivational_plot(
         label_offset=label_offset,
         attr=attr,
         G_big=G_0,
+        fontsize=14,
     )
     draw_labeled_multigraph(
         G_shap_l,
@@ -308,6 +302,7 @@ def motivational_plot(
         label_offset=label_offset,
         attr=attr,
         G_big=G_0,
+        fontsize=14,
     )
     draw_labeled_multigraph(
         G_shap_el,
@@ -320,6 +315,7 @@ def motivational_plot(
         label_offset=label_offset,
         attr=attr,
         G_big=G_0,
+        fontsize=14,
     )
 
     # plot
@@ -338,6 +334,7 @@ def motivational_plot(
         label_offset=label_offset,
         attr=attr,
         G_big=G_0,
+        fontsize=14,
     )
     draw_labeled_multigraph(
         G_l_small,
@@ -350,6 +347,7 @@ def motivational_plot(
         label_offset=label_offset,
         attr=attr,
         G_big=G_0,
+        fontsize=14,
     )
     draw_labeled_multigraph(
         G_el_small,
@@ -362,6 +360,7 @@ def motivational_plot(
         label_offset=label_offset,
         attr=attr,
         G_big=G_0,
+        fontsize=14,
     )
 
     # add colorbar
@@ -371,7 +370,7 @@ def motivational_plot(
     cbar.formatter.set_powerlimits((-2, 2))  # Controls when to switch to sci notation
     cbar.update_ticks()
     if attr == "del_flow":
-        cbar.set_label(r"$\Delta$ Flow (MW)", rotation=270, labelpad=5)
+        cbar.set_label(r"$\Delta$ Flow (MW)", rotation=270, labelpad=8, fontsize=14)
 
     elif attr == "load":
         ax_orig.set_title(r"$|\frac{f}{f_{\mathrm{max}}}|_{0}$")
@@ -385,7 +384,7 @@ def motivational_plot(
             r"$|\frac{f}{f_{\mathrm{max}}}|(\vec{\phi}^{e} + \vec{\phi}^{l})$"
         )
 
-        cbar.set_label(r"Load (%)", rotation=270, labelpad=5)
+        cbar.set_label(r"Load (%)", rotation=270, labelpad=8, fontsize=14)
 
     elif attr == "current":
         ax_orig.set_title(r"$I_{0}$")
@@ -397,8 +396,8 @@ def motivational_plot(
         ax_phil.set_title(r"$I(\vec{\phi}^{l})$")
         ax_phiel.set_title(r"$I(\vec{\phi}^{e} + \vec{\phi}^{l})$")
 
-        cbar.set_label(r"Current (kA)", rotation=270, labelpad=5)
-
+        cbar.set_label(r"Current (kA)", rotation=270, labelpad=8, fontsize=14)
+    cbar.ax.tick_params(labelsize=14)
     # add rectangle to the map
     x_min, x_max = ax_orig.get_xlim()
     y_min, y_max = ax_orig.get_ylim()
@@ -424,19 +423,27 @@ def motivational_plot(
     fig.savefig(f"{save_folder}/motivational_plot.png", dpi=300, bbox_inches="tight")
     fig.savefig(f"{save_folder}/motivational_plot.pdf", dpi=300, bbox_inches="tight")
 
+
 def interaction_equation_plot(
-    G_0, G_multi_data, rem_edges, labeled_edges, label_offset, node_labels,save_folder = plots_path):
-    
+    G_0,
+    G_multi_data,
+    rem_edges,
+    labeled_edges,
+    label_offset,
+    node_labels,
+    save_folder=plots_path,
+):
+
     # export data from G_multi_data
     P = G_multi_data["P"]
     I_m = G_multi_data["I_m"].item()
     B_d = G_multi_data["B_d"].item()
-    
+
     # Norm and colormap for delta flows
     rc("mathtext", fontset="dejavuserif")
     cmap_delta = get_cmap("coolwarm")
     NODE_ATTRS = {"node_color": "grey", "node_size": 50}
-    fig, ax = plt.subplots(1, 4, figsize=(16, 5))
+    fig, ax = plt.subplots(1, 4, figsize=(16, 3))
 
     G_0_small = G_0.subgraph(node_labels).copy()
 
@@ -512,6 +519,7 @@ def interaction_equation_plot(
         label_offset=label_offset,
         attr="del_flow",
         G_big=G_0,
+        fontsize=11,
     )
     # right panel: direct effect of b
     ax[0].set_title(r"$\Delta f(\{e\})$", fontsize=20)
@@ -526,6 +534,7 @@ def interaction_equation_plot(
         label_offset=label_offset,
         attr="del_flow",
         G_big=G_0,
+        fontsize=11,
     )
     ax[1].set_title(r"$\Delta f(\{l\})$", fontsize=20)
     #   middle panel: interaction effect
@@ -540,6 +549,7 @@ def interaction_equation_plot(
         label_offset=label_offset,
         attr="del_flow",
         G_big=G_0,
+        fontsize=11,
     )
     ax[2].set_title(r"$\iota_{el}$", fontsize=20)
 
@@ -557,6 +567,7 @@ def interaction_equation_plot(
         label_offset=label_offset,
         attr="del_flow",
         G_big=G_0,
+        fontsize=11,
     )
     ax[3].set_title(r"$\Delta f(\{e,l\})$", fontsize=20)
 
@@ -585,7 +596,8 @@ def interaction_equation_plot(
     # # add colorbar
     cax = fig.add_axes([0.92, 0.15, 0.02, 0.7])
     cbar = fig.colorbar(ScalarMappable(norm=norm_delta, cmap=cmap_delta), cax=cax)
-    cbar.set_label(r"$\Delta f$ (MW)", rotation=270, labelpad=5)
+    cbar.set_label(r"$\Delta f$ (MW)", rotation=270, labelpad=5, fontsize=11)
+    cbar.ax.tick_params(labelsize=11)
 
     fig.savefig(
         f"{save_folder}/interaction_plot_example.pdf", dpi=300, bbox_inches="tight"
@@ -593,14 +605,16 @@ def interaction_equation_plot(
     fig.savefig(
         f"{save_folder}/interaction_plot_example.png", dpi=300, bbox_inches="tight"
     )
-    
-def application_plot(G_0, G_multi_data, 
-    cmap = get_cmap("cividis"),
-    NODE_ATTRS = {"node_color": "grey", "node_size": 20},
-    file_name = SAVE_FILE_APPLICATIONS,
-    save_folder = plots_path,
-    ):
-    
+
+
+def application_plot(
+    G_0,
+    G_multi_data,
+    cmap=get_cmap("cividis"),
+    NODE_ATTRS={"node_color": "grey", "node_size": 20},
+    file_name=SAVE_FILE_APPLICATIONS,
+    save_folder=plots_path,
+):
     """
     Create application plots for specific outage cases.
     Args:
@@ -609,17 +623,14 @@ def application_plot(G_0, G_multi_data,
         cmap (matplotlib colormap): Colormap for plotting.
         NODE_ATTRS (dict): Node attributes for plotting.
     """
-    
-    
+
     # export data from G_multi_data
     P = G_multi_data["P"]
     I_m = G_multi_data["I_m"].item()
     B_d = G_multi_data["B_d"].item()
     # Load application cases
 
-
     scale_fonts(1)
-
 
     cases = load_quadruple_cases_csv(file_name)
     print(len(cases), "cases found")
@@ -658,7 +669,11 @@ def application_plot(G_0, G_multi_data,
         )
 
         direct_effect_attr = flow_attribution_dict(
-            affected_line=affected_line_idx, B_d=B_d, P=P, I=I_m, value_dict=direct_effects
+            affected_line=affected_line_idx,
+            B_d=B_d,
+            P=P,
+            I=I_m,
+            value_dict=direct_effects,
         )
 
         # combine both effects
@@ -706,7 +721,7 @@ def application_plot(G_0, G_multi_data,
             flip_sign=flip_sign,
             line_limit=line_limit,
             ylabel="Power flow (MW)",
-            label_size=12,
+            label_size=24,
         )
 
         # Get norm for colorbar
@@ -736,11 +751,12 @@ def application_plot(G_0, G_multi_data,
             node_kw=NODE_ATTRS,
             rem_edges=list(outage_lines),
             labeled_edges=[affected_line],
-            label_offset=0.4,
+            labeled_edge_pos={affected_line: (80, -80)},
+            label_offset=0.5,
             G_big=G_outages,
             attr=attr_map,
             label_rem_edges=True,
-            fontsize=12,
+            fontsize=24,
         )
         # colorbar
 
@@ -762,34 +778,43 @@ def application_plot(G_0, G_multi_data,
 
         if attr_map == "flow":
 
-            cbar_map.set_label(r"Flow (MW)", rotation=90, labelpad=5)
+            cbar_map.set_label(r"Flow (MW)", rotation=90, labelpad=5, fontsize=24)
 
         elif attr_map == "current":
 
-            cbar_map.set_label(r"Current (kA)", rotation=90, labelpad=5)
+            cbar_map.set_label(r"Current (kA)", rotation=90, labelpad=5, fontsize=24)
 
         elif attr_map == "load":
 
-            cbar_map.set_label(r"Power flow (% of line limit)", rotation=90, labelpad=5)
+            cbar_map.set_label(
+                r"Power flow (% of line limit)", rotation=90, labelpad=5, fontsize=24
+            )
+        cbar_map.ax.tick_params(labelsize=24)
 
         cbar_map.ax.yaxis.set_ticks_position("left")
 
         cbar_map.ax.yaxis.set_label_position("left")
 
         # Show and save
-
+        plt.tight_layout()
         plt.show()
 
-        fig.savefig(f"{save_folder}/application_quadruple_seed46_3_horizontal.pdf", bbox_inches="tight", dpi=300)
-        fig.savefig(f"{save_folder}/application_quadruple_seed46_3_horizontal.png", bbox_inches="tight", dpi=300)
+        fig.savefig(
+            f"{save_folder}/application_quadruple_seed46_3_horizontal.pdf",
+            bbox_inches="tight",
+            dpi=300,
+        )
+        fig.savefig(
+            f"{save_folder}/application_quadruple_seed46_3_horizontal.png",
+            bbox_inches="tight",
+            dpi=300,
+        )
 
 
 def main():
-    
-    
-    
+
     print("Creating plots...")
-    
+
     if not os.path.exists(plots_path):
         print(f"Creating directory {plots_path}...")
         os.makedirs(plots_path)
@@ -798,15 +823,18 @@ def main():
 
     print("Creating comparison plot between lodfs and shapley values...")
 
-
     # read pickled graph
-    
+
     # check if file exists
     if not os.path.exists(f"{postnetwork_path}/{SYNC_GRID}_deagg_graph.pkl"):
-        raise FileNotFoundError(f"File {postnetwork_path}/{SYNC_GRID}_deagg_graph.pkl not found.")
+        raise FileNotFoundError(
+            f"File {postnetwork_path}/{SYNC_GRID}_deagg_graph.pkl not found."
+        )
     if not os.path.exists(f"{postnetwork_path}/{SYNC_GRID}_deagg_matrices.npz"):
-        raise FileNotFoundError(f"File {postnetwork_path}/{SYNC_GRID}_deagg_matrices.npz not found.")
-    
+        raise FileNotFoundError(
+            f"File {postnetwork_path}/{SYNC_GRID}_deagg_matrices.npz not found."
+        )
+
     G_multi = pkl.load(open(f"{postnetwork_path}/{SYNC_GRID}_deagg_graph.pkl", "rb"))
     G_multi = sort_edge_indices(G_multi)
     G_multi_data = np.load(
@@ -820,14 +848,12 @@ def main():
     flows_0 = solve_lpf(P=P, B_d=B_d, I=I_m)
     G_0 = add_flows_to_graph(G_multi, flows_0)
 
-   
-
     print(f"Loading Braess paradox cases from {SAVE_FILE_BRAESS}...")
-    
+
     # check if file exists
     if not os.path.exists(SAVE_FILE_BRAESS):
         raise FileNotFoundError(f"File {SAVE_FILE_BRAESS} not found.")
-    
+
     cases = load_cases_csv(SAVE_FILE_BRAESS)
 
     cases_country = []
@@ -847,8 +873,7 @@ def main():
     for c in cases_country:
         e1, e2, reversed_edges = c
         cases_unique.add((e1, e2))
-        
-        
+
     # choose example no. 3
     idx = 3
 
@@ -860,19 +885,19 @@ def main():
     labeled_edges = cases[idx][2]
     label_offset = -0.23
     label_offset_orig = 0.23
-    ax_orig_aspect = 1.5
-    ax_map_aspect = 1.75
+    ax_orig_aspect = 1.25
+    ax_map_aspect = 1.5
 
     # motivational plot
     print(f"Creating motivational plot...")
     motivational_plot(
         G_0=G_0,
-        G_multi_data = G_multi_data,
-        node_labels = node_labels,
-        rem_edges = rem_edges,
-        labeled_edges = labeled_edges,
-        label_offset = label_offset,
-        label_offset_orig = label_offset_orig,
+        G_multi_data=G_multi_data,
+        node_labels=node_labels,
+        rem_edges=rem_edges,
+        labeled_edges=labeled_edges,
+        label_offset=label_offset,
+        label_offset_orig=label_offset_orig,
         ax_orig_aspect=ax_orig_aspect,
         ax_map_aspect=ax_map_aspect,
     )
@@ -880,15 +905,14 @@ def main():
     # interaction equation plot
     print(f"Creating interaction equation plot...")
     interaction_equation_plot(
-        G_0 = G_0,
-        G_multi_data = G_multi_data,
-        rem_edges = rem_edges,
-        labeled_edges = labeled_edges,
-        label_offset = label_offset,
-        node_labels = node_labels,
+        G_0=G_0,
+        G_multi_data=G_multi_data,
+        rem_edges=rem_edges,
+        labeled_edges=labeled_edges,
+        label_offset=label_offset,
+        node_labels=node_labels,
     )
-    
-    
+
     # check if application file exists
     if not os.path.exists(SAVE_FILE_APPLICATIONS):
         raise FileNotFoundError(f"File {SAVE_FILE_APPLICATIONS} not found.")
@@ -896,9 +920,8 @@ def main():
     print(f"Loading application cases from {SAVE_FILE_APPLICATIONS}...")
     # application plot
     print("Creating application plot...")
-    application_plot(G_0=G_0, G_multi_data = G_multi_data)
-        
-    
-        
+    application_plot(G_0=G_0, G_multi_data=G_multi_data)
+
+
 if __name__ == "__main__":
     main()

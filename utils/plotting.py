@@ -109,13 +109,24 @@ def create_motivational_layout():
 
     # Left column: lower map with upper inset space
     gs_left = gridspec.GridSpecFromSubplotSpec(
-        2, 1, subplot_spec=outer_gs[:, 0], height_ratios=[1, 1], wspace=0.05, hspace=0.2
+        2,
+        1,
+        subplot_spec=outer_gs[:, 0],
+        height_ratios=[1, 1],
+        wspace=0.05,
+        hspace=0.2,
     )
     ax_orig = fig.add_subplot(gs_left[0], projection=ccrs.PlateCarree())
     ax_map = fig.add_subplot(gs_left[1], projection=ccrs.PlateCarree())
     # Right plot centered manually
     gs_right = gridspec.GridSpecFromSubplotSpec(
-        2, 3, subplot_spec=outer_gs[:, 1:], height_ratios=[1, 1], width_ratios=[1, 1, 1]
+        2,
+        3,
+        subplot_spec=outer_gs[:, 1:],
+        height_ratios=[1, 1],
+        width_ratios=[1, 1, 1],
+        wspace=0.05,
+        hspace=0.2,
     )
     ax_dfe = fig.add_subplot(gs_right[0, 0])
     ax_dfl = fig.add_subplot(gs_right[0, 1])
@@ -127,26 +138,26 @@ def create_motivational_layout():
 
     # Add colorbar axes on the right side of figure (outside the gridspec)
     cbar_ax = fig.add_axes(
-        [0.93, 0.15, 0.015, 0.7]
+        [0.91, 0.15, 0.015, 0.7]
     )  # [left, bottom, width, height] in figure fraction
 
     # Titles
     # ax_map.set_title(r'$Sync Grid$', fontsize=12)
-    ax_orig.set_title(r"$f_0$", fontsize=12)
+    ax_orig.set_title(r"$f_0$", fontsize=14)
 
-    ax_dfe.set_title(r"$\Delta f (\{e\})$")
-    ax_dfl.set_title(r"$\Delta f (\{l\})$")
-    ax_dfel.set_title(r"$\Delta f (\{e, l\})$")
-    ax_phie.set_title(r"$\phi^e$")
-    ax_phil.set_title(r"$\phi^l$")
-    ax_phiel.set_title(r"$\phi^{e} + \phi^{l}$")
+    ax_dfe.set_title(r"$\Delta f (\{e\})$", fontsize=14)
+    ax_dfl.set_title(r"$\Delta f (\{l\})$", fontsize=14)
+    ax_dfel.set_title(r"$\Delta f (\{e, l\})$", fontsize=14)
+    ax_phie.set_title(r"$\phi^e$", fontsize=14)
+    ax_phil.set_title(r"$\phi^l$", fontsize=14)
+    ax_phiel.set_title(r"$\phi^{e} + \phi^{l}$", fontsize=14)
 
     # Hide ticks
     for ax in [ax_map, ax_dfe, ax_dfl, ax_dfel, ax_phie, ax_phil, ax_phiel, ax_orig]:
         ax.set_xticks([])
         ax.set_yticks([])
 
-    plt.tight_layout(rect=[0, 0, 0.92, 1])  # Leave space for colorbar on right
+    # plt.tight_layout(rect=[0, 0, 0.92, 1])  # Leave space for colorbar on right
 
     return (
         fig,
@@ -181,6 +192,7 @@ def draw_labeled_multigraph(
     padding=0.2,
     G_big=None,
     alpha=0.1,
+    fontsize=9,
 ):
     """
     Draw directed MultiDiGraph with edges colored by 'flow' attribute.
@@ -399,7 +411,7 @@ def draw_labeled_multigraph(
                     mx,
                     my,
                     label,
-                    fontsize=9,
+                    fontsize=fontsize,
                     ha="center",
                     va="center",
                     # backgroundcolor="white",
@@ -418,6 +430,7 @@ def draw_labeled_multigraph_threshold(
     offset_step=0.04,
     node_names=False,
     labeled_edges=[],  # List of (u, v, key) edges to label
+    labeled_edge_pos={},
     flow_format="{:.2f}",  # Format string for flow label
     label_offset=0,
     rem_edges=[],
@@ -636,6 +649,7 @@ def draw_labeled_multigraph_threshold(
 
                 # Midpoint of the edge
                 mx, my = (start[0] + end[0]) / 2, (start[1] + end[1]) / 2
+                mx_original, my_original = mx, my
 
                 # Apply perpendicular offset (normal vector to the edge)
                 kx = -(end[1] - start[1]) / length  # -dy / length
@@ -678,23 +692,52 @@ def draw_labeled_multigraph_threshold(
                     label = flow_format.format(np.abs(data_to_show))
 
                 # Draw the text label
-                ax.text(
-                    mx,
-                    my,
-                    label,
-                    fontsize=fontsize,
-                    ha="center",
-                    va="center",
-                    # backgroundcolor="white",
-                    rotation=angle,
-                    rotation_mode="anchor",
-                    bbox=dict(
-                        facecolor="white",
-                        edgecolor="none",
-                        boxstyle="round,pad=0.2",
-                        alpha=0.7,
-                    ),
-                )
+                if labeled_edge_pos.get(edge_key) is None:
+                    ax.text(
+                        mx,
+                        my,
+                        label,
+                        fontsize=fontsize,
+                        ha="center",
+                        va="center",
+                        # backgroundcolor="white",
+                        rotation=angle,
+                        rotation_mode="anchor",
+                        bbox=dict(
+                            facecolor="white",
+                            edgecolor="none",
+                            boxstyle="round,pad=0.2",
+                            alpha=0.7,
+                        ),
+                    )
+                else:
+                    lx, ly = labeled_edge_pos[edge_key]
+                    ax.annotate(
+                        label,
+                        xy=(
+                            mx_original,
+                            my_original,
+                        ),  # point on the edge (arrow target)
+                        xytext=(lx, ly),  # position of the text box
+                        textcoords="offset points",
+                        ha="left",
+                        va="top",
+                        fontsize=fontsize,
+                        rotation=0,
+                        bbox=dict(
+                            boxstyle="round,pad=0.2",
+                            facecolor="white",
+                            edgecolor="none",
+                            alpha=0.7,
+                        ),
+                        arrowprops=dict(
+                            arrowstyle="->",
+                            linewidth=1,
+                            color="black",
+                            shrinkA=0,
+                            shrinkB=0,
+                        ),
+                    )
 
 
 def approximation_figure_compare_random(
@@ -720,8 +763,8 @@ def approximation_figure_compare_random(
         title (string): Title for subplts. Default is None, which results in no title.
         show_plot (bool): Default is False. If plot is shown.
     """
-    scale_fonts(0.75)
-    fig, axes = plt.subplots(2, 2, figsize=(10, 10), gridspec_kw={"wspace": 0.3})
+    scale_fonts(1)
+    fig, axes = plt.subplots(2, 2, figsize=(10, 8), gridspec_kw={"wspace": 0.3})
     if title is not None:
         axes[0, 1].set_title("Random")
         axes[0, 0].set_title(title)
@@ -1074,7 +1117,7 @@ def plot_mult_error(
         linestyle="dashed",
         label="exact calculation",
     )
-    axes[2].legend()
+    axes[2].legend(fontsize=20)
     axes[2].set_ylabel("Computation time (s)")
     axes[2].set_xlabel("k")
 
@@ -1144,14 +1187,14 @@ def plot_waterfall(
         fig, ax = plt.subplots(figsize=(8, 5))
     start = baseline
     if f0 is not None:
-        ax.bar(-1, baseline, bottom=0, color="gray", edgecolor="black")
+        ax.bar(-1, baseline, bottom=0, color="gray", edgecolor="black", width=0.7)
         ax.text(
             -1,
-            baseline + 0.02 * (ax.get_ylim()[1] - ax.get_ylim()[0]),
+            -0.02 * (ax.get_ylim()[1] - ax.get_ylim()[0]),
             "$f_0$",
             ha="center",
-            va="bottom" if baseline >= 0 else "top",
-            rotation=0,
+            va="bottom" if -baseline >= 0 else "top",
+            rotation=90,
             fontsize=label_size,
         )
         ax.plot(
@@ -1164,7 +1207,7 @@ def plot_waterfall(
 
     for i, (f, v, c) in enumerate(zip(features, values, colors)):
         # Each bar starts at the current cumulative "start"
-        ax.bar(i, v, bottom=start, color=c, edgecolor="black")
+        ax.bar(i, v, bottom=start, color=c, edgecolor="black", width=0.7)
 
         # Draw a dashed horizontal line to the next bar (if not last)
         if i < len(values) - 1:
@@ -1187,24 +1230,31 @@ def plot_waterfall(
         if label == f"$\\Delta f_a$":
             val_sum = delta_f
         # Decide offset direction based on sign
-        offset = 0.02 * (
+        offset = -0.01 * (
             ax.get_ylim()[1] - ax.get_ylim()[0]
         )  # scale offset by y-axis range
-        y_pos = val_sum + baseline + (offset if val >= 0 else -offset)
+        y_pos = val_sum - val + baseline + (offset if val >= 0 else -offset)
 
         ax.text(
             i,
             y_pos,
             label,
             ha="center",
-            va="bottom" if val >= 0 else "top",
-            rotation=0,
-            bbox=dict(facecolor="white", edgecolor="none", boxstyle="round,pad=0.2"),
+            va="bottom" if -val >= 0 else "top",
+            rotation=90,
             fontsize=label_size,
+            bbox=dict(facecolor="white", edgecolor="none", boxstyle="round,pad=0"),
         )
 
     # Formatting
-    ax.bar(len(features), delta_f, bottom=baseline, color="gray", edgecolor="black")
+    ax.bar(
+        len(features),
+        delta_f,
+        bottom=baseline,
+        color="gray",
+        edgecolor="black",
+        width=0.7,
+    )
     ax.plot(
         [len(features) - 1, len(features)],
         [delta_f + baseline, delta_f + baseline],
@@ -1214,7 +1264,7 @@ def plot_waterfall(
     )
     if line_limit is not None:
         ax.axhline(line_limit, color=pink, linestyle="dashed", label="line limit")
-        ax.legend()
+        ax.legend(fontsize=label_size)
 
     ax.xaxis.set_ticks_position("top")
     ax.xaxis.set_label_position("top")
@@ -1222,7 +1272,8 @@ def plot_waterfall(
     ax.spines["right"].set_visible(False)
     ax.spines["bottom"].set_position("zero")
     ax.set_xticks([])
-    ax.set_ylabel(ylabel)
+    ax.tick_params(axis="y", labelsize=label_size)
+    ax.set_ylabel(ylabel, fontsize=label_size)
     if file_path is not None:
         fig.savefig(file_path, dpi=300, bbox_inches="tight")
 
