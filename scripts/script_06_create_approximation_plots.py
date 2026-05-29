@@ -68,8 +68,8 @@ G_0 = add_flows_to_graph(G_multi, flows_0)
 
 # Create single outage line set plot
 print("Creating single outage line set plot...")
-file_path_single = "s50_final_n16.pkl"
-figure_path_single = "s50_final_n16.pdf"
+file_path_single = "s50_lodf_final_n16.pkl"
+figure_path_single = "s50_lodf_final_n16.pdf"
 plt.rcParams["axes.prop_cycle"] = plt.cycler(color=plt.cm.Dark2.colors)
 with open(os.path.join(shap_approx_path, file_path_single), "rb") as f:
     results = pkl.load(f)
@@ -99,8 +99,8 @@ for cluster_result in results["cluster_results"]:
 print("Shap Time: ", results["shap_time"])
 
 # Create multiple outage line sets plot
-file_path_mult = "s50_final_knn_n16_m100.pkl"
-figure_path_mult = "s50_final_knn_n16_m100.pdf"
+file_path_mult = "s50_lodf_final_knn_n16_m100.pkl"
+figure_path_mult = "s50_lodf_final_n16_m100.pdf"
 
 with open(
     os.path.join(shap_approx_path, file_path_mult),

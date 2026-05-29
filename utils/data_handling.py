@@ -15,7 +15,6 @@ import copy
 import csv
 
 
-
 def serialize_edge(edge):
     return f"{edge[0]}-{edge[1]}-{edge[2]}"
 
@@ -55,6 +54,7 @@ def load_cases_csv(filename=""):
         pass
     return cases
 
+
 def build_networkx_graph(pypsa_network, snet_index=None):
     """Build a networkx graph from the pypsa networks"""
     pypsa_network.determine_network_topology()
@@ -90,6 +90,7 @@ def build_networkx_graph(pypsa_network, snet_index=None):
             raise (RuntimeError("There duplicated edges in the PyPSA network"))
 
     nx.set_node_attributes(F, pos, "pos")
+
     return F
 
 
@@ -201,7 +202,7 @@ def get_matrices_from_nx_graph(nx_graph):
     return I_m, B_d, num_parallels, line_limits
 
 
-def shuffle_knn_dict(original_knn_dict, seed):
+def shuffle_knn_dict(original_knn_dict, seed, k):
     """
     Creates a random knn dict that matches the number of neirest neighbours of another dict and just shuffles the lines.
     Args:
@@ -215,66 +216,10 @@ def shuffle_knn_dict(original_knn_dict, seed):
     keys = list(original_knn_dict.keys())
 
     for key, neighbours in original_knn_dict.items():
-        n_neighbors = len(neighbours)
         possible_neighbors = list(set(keys) - {key})
-        random_neighbors = random.sample(possible_neighbors, n_neighbors)
+        random_neighbors = random.sample(possible_neighbors, k)
         rand_knn_dict[key] = random_neighbors
     return rand_knn_dict
-
-
-def shuffle_knn_dict_second_order(original_knn_dict, seed):
-    """
-    Creates a random knn dict that matches the number of neirest neighbours of another dict and just shuffles the lines.
-    Args:
-        original_knn_dict (dict): Knn dict to shuffle with line as key and neirest neighbours as values.
-        seed (int): random seed for reproducability
-    Returns:
-        rand_knn_dict (dict):  randomly shuffled knn dict.
-    """
-    random.seed(seed)
-    rand_knn_dict = {}
-    keys = list(original_knn_dict.keys())
-
-    for key, neighbours in original_knn_dict.items():
-        n_neighbors = len(neighbours)
-        possible_neighbors = list(set(keys) - set(key))
-        random_neighbors = random.sample(possible_neighbors, n_neighbors)
-        rand_knn_dict[key] = random_neighbors
-    return rand_knn_dict
-
-
-def get_knn_dict(original_knn_dict, G):
-    """
-    Creates a cluster dict from a knn dict.
-    Args:
-        original_knn_dict (dict): Knn dict to convert, with cluster indices as values and lines as index.
-        G (networkx.Graph): The original graph.
-    Returns:
-        knn_cluster_dict (dict): Cluster dict with matrix indeces.
-    """
-    knn_cluster_dict = {}
-    for key, value in original_knn_dict.items():
-        edges_mx = nx_edges_to_matrix_indices(list(value), G)
-        key_mx = nx_edges_to_matrix_indices([key], G)[0]
-        knn_cluster_dict[key_mx] = edges_mx
-    return knn_cluster_dict
-
-
-def get_knn_dict_second_order(original_knn_dict, G):
-    """
-    Creates a cluster dict from a knn dict.
-    Args:
-        original_knn_dict (dict): Knn dict to convert, with cluster indices as values and lines as index.
-        G (networkx.Graph): The original graph.
-    Returns:
-        knn_cluster_dict (dict): Cluster dict with matrix indeces.
-    """
-    knn_cluster_dict = {}
-    for key, value in original_knn_dict.items():
-        edges_mx = nx_edges_to_matrix_indices(list(value), G)
-        key_mx = nx_edges_to_matrix_indices(list(key), G)
-        knn_cluster_dict[tuple(key_mx)] = edges_mx
-    return knn_cluster_dict
 
 
 ##### multigraph functions #####
@@ -374,6 +319,7 @@ def get_matrices_from_nx_graph_multigraph(nx_graph):
 
 
 from utils.cascade_simulation import calc_num_parallel_after_failure
+
 
 def deaggregate_parallel_lines(G: nx.Graph):
     """
@@ -701,58 +647,6 @@ def remove_negligable_affected_lines(
                             affected_line
                         ] = None
     return results_copy
-
-
-# def find_next_neighbors(G, edges):
-#     next_neighbors = set()
-#     for edge in edges:
-#         u, v, k = edge
-#         neighbors_u = set(G.neighbors(u))
-#         neighbors_v = set(G.neighbors(v))
-
-#         next_neighbors.update(neighbors_u)
-#         next_neighbors.update(neighbors_v)
-
-#     return next_neighbors
-
-
-# def find_next_next_neighbors_until_connected(G, edges):
-
-#     print(f"Finding next next neighbors for edges: {edges}")
-
-#     # Step 1: collect neighbors of all given edges
-#     all_nodes_neighbors = set()
-#     for edge in edges:
-#         nodes_neighbors = find_next_neighbors(G, [edge])
-#         all_nodes_neighbors |= nodes_neighbors  # union
-
-#     # Step 2: get edges connected to those neighbors
-#     all_edges_neighbors = [
-#         (u, v, k)
-#         for u, v, k in G.edges
-#         if u in all_nodes_neighbors or v in all_nodes_neighbors
-#     ]
-
-#     # Step 3: induced subgraph
-#     G_u = G.subgraph(all_nodes_neighbors).copy()
-
-#     # Step 4: expand until connected
-#     while not nx.is_connected(G_u):
-#         new_nodes_neighbors = set()
-#         for e in all_edges_neighbors:
-#             new_nodes_neighbors |= find_next_neighbors(G, [e])
-
-#         # update edges + nodes
-#         all_nodes_neighbors |= new_nodes_neighbors
-#         all_edges_neighbors = [
-#             (u, v, k)
-#             for u, v, k in G.edges
-#             if u in all_nodes_neighbors or v in all_nodes_neighbors
-#         ]
-
-#         G_u = G.subgraph(all_nodes_neighbors).copy()
-        
-#         return all_nodes_neighbors
 
 
 def find_next_neighbors(G, edges):

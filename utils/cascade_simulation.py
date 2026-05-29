@@ -213,7 +213,7 @@ def solve_lpf(P, B_d, I, L=None):
         flows: Power flows
     """
 
-    if L == None:
+    if L is None:
         L = I.dot(B_d).dot(I.T)
 
     theta = np.zeros(L.shape[0])

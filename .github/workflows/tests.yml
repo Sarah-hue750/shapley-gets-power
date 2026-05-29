@@ -1,0 +1,42 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+    container:
+      image: condaforge/mambaforge
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Create conda environment
+        shell: bash
+        run: |
+          conda env create --name test_env --file environment.yml
+          conda install -n test_env pytest pytest-cov -y
+
+      - name: Run tests with coverage
+        shell: bash
+        run: |
+          conda run -n test_env python -m pytest \
+            --cov=utils \
+            --cov-report term \
+            --cov-report xml:coverage.xml \
+            tests/
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml

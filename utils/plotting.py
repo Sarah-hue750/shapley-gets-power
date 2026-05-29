@@ -26,7 +26,7 @@ import matplotlib as mpl
 mpl.rcParams["text.usetex"] = False
 
 
-def build_p0_graph(network, snapshot, p0_vals):  # @ToDo:
+def build_p0_graph(network, snapshot, p0_vals):
     """
     Build a plot graph from the network and snapshot.
     Assigns power flow values (p0) to edges and orients them according to flow direction.
@@ -200,7 +200,6 @@ def draw_labeled_multigraph(
     Near-zero flow edges are red and drawn without arrows.
     Only edges in `labeled_edges` receive flow labels.
     """
-
     if ax is None:
         fig, ax = plt.subplots()
 
@@ -447,7 +446,6 @@ def draw_labeled_multigraph_threshold(
     Near-zero flow edges are red and drawn without arrows.
     Only edges in `labeled_edges` receive flow labels.
     """
-
     if ax is None:
         fig, ax = plt.subplots()
 
@@ -769,7 +767,7 @@ def approximation_figure_compare_random(
         axes[0, 1].set_title("Random")
         axes[0, 0].set_title(title)
 
-    x_max, bin_edges = plot_error_frequency(
+    x_max, y_max, bin_edges = plot_error_frequency(
         results=results, chosen_label=chosen_cluster_label, ax=axes[1, 1], rand=True
     )
     norm_rand, cmap_rand = plot_approx_error_map(
@@ -789,8 +787,9 @@ def approximation_figure_compare_random(
         results=results,
         chosen_label=chosen_cluster_label,
         ax=axes[1, 0],
-        x_max=x_max,
-        bin_edges=bin_edges,
+        y_max=y_max,
+        # x_max=x_max,
+        # bin_edges=bin_edges,
     )
     norm, cmap = plot_approx_error_map(
         results=results,
@@ -835,49 +834,6 @@ def approximation_figure_compare_random(
         plt.show()
 
 
-def approximation_figure_compare_random_taylor(
-    results,
-    attr="flow_change",
-    chosen_cluster_label=None,
-    file_path=None,
-    title=None,
-    show_plot=None,
-):
-    """
-    Creates figure to compare normal clustering with random clustering.
-
-    Args:
-        results (list): dict with results information
-        outage_lines (list): list of indeces of outage lines
-        attr (string): attribute to consider. Default is "flow_change".
-        chosen_cluster_label (float/int): Resolution of clustering to use. Default is None, which results in using the first of the list.
-        file_path (string): Path where plot is saved. Default is None, for which it is not saved.
-        title (string): Title for subplts. Default is None, which results in no title.
-        show_plot (bool): Default is False. If plot is shown.
-    """
-    scale_fonts(0.75)
-    fig, axes = plt.subplots(1, 2, figsize=(10, 5), gridspec_kw={"wspace": 0.3})
-    if title is not None:
-        axes[1].set_title("Random")
-        axes[0].set_title(title)
-
-    x_max, bin_edges = plot_error_frequency(
-        results=results, chosen_label=chosen_cluster_label, ax=axes[1], rand=True
-    )
-    plot_error_frequency(
-        results=results,
-        chosen_label=chosen_cluster_label,
-        ax=axes[0],
-        x_max=x_max,
-        bin_edges=bin_edges,
-    )
-
-    if file_path is not None:
-        fig.savefig(file_path, dpi=300, bbox_inches="tight")
-    if show_plot:
-        plt.show()
-
-
 def plot_error_frequency(
     results,
     attr="flow_change",
@@ -885,6 +841,7 @@ def plot_error_frequency(
     ax=None,
     rand=False,
     x_max=None,
+    y_max=None,
     bin_edges=None,
 ):
     """
@@ -926,8 +883,11 @@ def plot_error_frequency(
     ax.set_yscale("log")
     if x_max is None:
         x_max = ax.get_xlim()[1]
+    if y_max is None:
+        y_max = ax.get_ylim()[1]
     ax.set_xlim(0, x_max)
-    return x_max, bin_edges
+    ax.set_ylim(0, y_max)
+    return x_max, y_max, bin_edges
 
 
 def plot_approx_error_map(
@@ -1030,23 +990,29 @@ def plot_mult_error(
             results, {"flow_change": threshold, "load": 0.01, "current": 0.01}
         )
         shap_times.append(results["shap_time"])
-        for cluster_result, cluster_result_filtered in zip(
-            results["cluster_results"], results_filtered["cluster_results"]
-        ):
+        for cluster_result in results["cluster_results"]:
             label = cluster_result["label"]
             time = cluster_result["approx_time"]
             time_dict.setdefault(label, []).append(
                 abs(time) + r["cluster_creation_times"][label]
             )
             abs_diff = cluster_result["differences"][f"abs_diff_{attr}"]
+            values = {}
+            for outage_line in abs_diff:
+                for affected_line, val in abs_diff[outage_line].items():
+                    values[affected_line] = values.get(affected_line, 0) + val
+            values = {k: abs(v) for k, v in values.items()}
+            num_above_threshold[label] = num_above_threshold.get(label, 0) + sum(
+                1 for v in values.values() if v > threshold
+            )
+            total_num[label] = total_num.get(label, 0) + sum(1 for v in values.values())
+        for cluster_result_filtered in results_filtered["cluster_results"]:
+            label = cluster_result_filtered["label"]
             abs_diff_filtered = cluster_result_filtered["differences"][
                 f"abs_diff_{attr}"
             ]
-            values = {}
             values_filtered = {}
-            for outage_line, outage_line_filtered in zip(abs_diff, abs_diff_filtered):
-                for affected_line, val in abs_diff[outage_line].items():
-                    values[affected_line] = values.get(affected_line, 0) + val
+            for outage_line_filtered in abs_diff_filtered:
                 for affected_line, val in abs_diff_filtered[
                     outage_line_filtered
                 ].items():
@@ -1057,13 +1023,7 @@ def plot_mult_error(
             box_plots.setdefault(label, []).extend(
                 abs(v) for v in values_filtered.values()
             )
-            values = {k: abs(v) for k, v in values.items()}
-            # maximum_approx_errors.setdefault(label, []).append(max(values.values()))
             maximum_approx_errors.setdefault(label, []).append(max(box_plots[label]))
-            num_above_threshold[label] = num_above_threshold.get(label, 0) + sum(
-                1 for v in values.values() if v > threshold
-            )
-            total_num[label] = total_num.get(label, 0) + sum(1 for v in values.values())
     maximum_approx_errors = {
         k: max(v) if v else None for k, v in maximum_approx_errors.items()
     }
@@ -1151,7 +1111,6 @@ def plot_waterfall(
         ylabel (string): Y-axis label. Default is "Flow change (MW)".
         label_size (int): Font size of labels. Default is 10.
     """
-
     # Sort by absolute value (most important first)
     sorted_items_full = sorted(
         combined_effects.items(), key=lambda x: abs(x[1]), reverse=True

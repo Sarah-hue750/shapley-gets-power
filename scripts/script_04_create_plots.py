@@ -4,7 +4,6 @@ import os
 import pickle as pkl
 import warnings
 
-
 # --- Numerical Libraries ---
 import numpy as np
 import matplotlib.pyplot as plt
@@ -100,6 +99,11 @@ def motivational_plot(
         file_name (str): Name of the output file for the plot.
         ax_orig_aspect (float): Aspect ratio for the original graph axis.
         ax_map_aspect (float): Aspect ratio for the map axis.
+        save_folder (path) : folder where figures are saved. Default is plots_path.
+        cmap (mathplotlib cmap): color map for power flows. Default is cividis.
+        cmap_delta (mathplotlib cmap): color map for power flow differences. Default is coolwarm.
+        attr (string): Attribute to display. Default is "del_flow".
+        NODE_ATTRS (dict): Attributes for displayed nodes. Default is {"node_color": "grey", "node_size": 50}.
     """
     (
         fig,
@@ -433,14 +437,12 @@ def interaction_equation_plot(
     node_labels,
     save_folder=plots_path,
 ):
-
     # export data from G_multi_data
     P = G_multi_data["P"]
     I_m = G_multi_data["I_m"].item()
     B_d = G_multi_data["B_d"].item()
 
     # Norm and colormap for delta flows
-    rc("mathtext", fontset="dejavuserif")
     cmap_delta = get_cmap("coolwarm")
     NODE_ATTRS = {"node_color": "grey", "node_size": 50}
     fig, ax = plt.subplots(1, 4, figsize=(16, 3))
@@ -522,7 +524,7 @@ def interaction_equation_plot(
         fontsize=11,
     )
     # right panel: direct effect of b
-    ax[0].set_title(r"$\Delta f(\{e\})$", fontsize=20)
+    ax[0].set_title(r"$\Delta f (\{e\})$", fontsize=20)
     draw_labeled_multigraph(
         G_direct_effect_l,
         ax=ax[1],
@@ -536,7 +538,7 @@ def interaction_equation_plot(
         G_big=G_0,
         fontsize=11,
     )
-    ax[1].set_title(r"$\Delta f(\{l\})$", fontsize=20)
+    ax[1].set_title(r"$\Delta f (\{l\})$", fontsize=20)
     #   middle panel: interaction effect
     draw_labeled_multigraph(
         G_interaction_effect,
@@ -622,6 +624,8 @@ def application_plot(
         G_multi_data (dict): Dictionary containing matrices and data for the flow network.
         cmap (matplotlib colormap): Colormap for plotting.
         NODE_ATTRS (dict): Node attributes for plotting.
+        file_name (path): folder where application examples are saved. Default is SAVE_FILE_APPLICATIONS.
+        save_folder (path): folder where figures are saved. Default is plots_path.
     """
 
     # export data from G_multi_data
@@ -629,7 +633,6 @@ def application_plot(
     I_m = G_multi_data["I_m"].item()
     B_d = G_multi_data["B_d"].item()
     # Load application cases
-
     scale_fonts(1)
 
     cases = load_quadruple_cases_csv(file_name)

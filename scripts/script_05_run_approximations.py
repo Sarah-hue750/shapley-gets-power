@@ -33,11 +33,8 @@ from utils.data_handling import (
     add_flows_to_graph,
     remove_random_edges,
     nx_edges_to_matrix_indices,
-    get_knn_dict,
 )
-from utils.collectivity_clustering import (
-    knn_failure_subgraphs
-)
+from utils.collectivity_clustering import get_knn_dict_new
 
 from utils.calculate_approximations import (
     approximation_comparison_multiple_outages_knn,
@@ -74,14 +71,11 @@ random_outage_lines = nx_edges_to_matrix_indices(rand_edges, G_0)
 
 all_lines = range(0, B_d.shape[0])
 affected_lines = [line for line in all_lines if line not in random_outage_lines]
+
 ks = [2, 4, 6, 8, 10, 12]
 knn_dicts = {}
 for k in ks:
-    knn_orig = knn_failure_subgraphs(
-        graph=G_0, edge_failed=rand_edges, nearest_neighbors=k
-    )
-    knn_dicts[k] = get_knn_dict(knn_orig, G_0)
-
+    knn_dicts[k] = get_knn_dict_new(M=set(random_outage_lines), G=G_0, k=k)
 
 
 # Create multiple outage sets approximations
@@ -95,20 +89,18 @@ if __name__ == "__main__":
         I=I_m,
         num_outage_sets=100,
         num_edges=16,
-        file_name="s50_final",
+        file_name="s50_lodf_final",
         seed=seed,
     )
     approximation_comparison_knn(
-    affected_lines=affected_lines,
-    outage_lines=random_outage_lines,
-    knn_dicts=knn_dicts,
-    P=P,
-    B_d=B_d,
-    M=set(random_outage_lines),
-    I=I_m,
-    G=G_0,
-    file_name="s50_final",
-    seed = seed,
+        affected_lines=affected_lines,
+        outage_lines=random_outage_lines,
+        knn_dicts=knn_dicts,
+        P=P,
+        B_d=B_d,
+        M=set(random_outage_lines),
+        I=I_m,
+        G=G_0,
+        file_name="s50_lodf_final",
+        seed=seed,
     )
-    
-    
