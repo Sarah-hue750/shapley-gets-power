@@ -229,6 +229,9 @@ def draw_labeled_multigraph(
 
         # Iterate over grouped parallel edges
         for pair, edges in edge_groups.items():
+            edges = sorted(
+                edges, key=lambda e: (str(e[1]), str(e[2]), str(e[3]))
+            )  # Test
             n = len(edges)
             offsets = np.linspace(
                 -offset_step * (n - 1) / 2, offset_step * (n - 1) / 2, n
@@ -415,7 +418,7 @@ def draw_labeled_multigraph(
                     va="center",
                     # backgroundcolor="white",
                     rotation=angle,
-                    rotation_mode="anchor",
+                    rotation_mode="default",
                 )
 
 
@@ -475,6 +478,9 @@ def draw_labeled_multigraph_threshold(
 
         # Iterate over grouped parallel edges
         for pair, edges in edge_groups.items():
+            edges = sorted(
+                edges, key=lambda e: (str(e[1]), str(e[2]), str(e[3]))
+            )  # Test
             n = len(edges)
             offsets = np.linspace(
                 -offset_step * (n - 1) / 2, offset_step * (n - 1) / 2, n
@@ -614,7 +620,7 @@ def draw_labeled_multigraph_threshold(
                         va="center",
                         # backgroundcolor="white",
                         rotation=angle,
-                        rotation_mode="anchor",
+                        rotation_mode="default",
                     )
 
             else:
@@ -700,7 +706,7 @@ def draw_labeled_multigraph_threshold(
                         va="center",
                         # backgroundcolor="white",
                         rotation=angle,
-                        rotation_mode="anchor",
+                        rotation_mode="default",
                         bbox=dict(
                             facecolor="white",
                             edgecolor="none",
@@ -1058,10 +1064,11 @@ def plot_mult_error(
 
     # Sort keys
     sorted_keys = sorted(share_above_threshold.keys())
-    sorted_share_above_threshold = [share_above_threshold[k] for k in sorted_keys]
+    # get percentage
+    sorted_share_above_threshold = [share_above_threshold[k] * 100 for k in sorted_keys]
     print("Share above threshold:", share_above_threshold)
     axes[1].plot(sorted_keys, sorted_share_above_threshold, marker="o")
-    axes[1].set_ylabel(r"Share of $\sigma_a^{\text{approx}}$ > " + f"{threshold} MW")
+    axes[1].set_ylabel(r"% of $\sigma_a^{\text{approx}}$ > " + f"{threshold} MW")
     axes[2].errorbar(
         time_dict.keys(),
         means_time,

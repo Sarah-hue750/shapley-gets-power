@@ -194,6 +194,7 @@ def motivational_plot(
         step = 500
         candidate_ticks = np.arange(step, abs(attr_array).max(), step)
         middle_ticks = candidate_ticks[candidate_ticks >= abs(attr_array).min()]
+        middle_ticks = middle_ticks[:-1]  # to avoid overlap
         ticks = np.concatenate(
             ([abs(attr_array).min()], middle_ticks, [abs(attr_array).max()])
         )
@@ -724,7 +725,7 @@ def application_plot(
             flip_sign=flip_sign,
             line_limit=line_limit,
             ylabel="Power flow (MW)",
-            label_size=24,
+            label_size=20,
         )
 
         # Get norm for colorbar
@@ -759,7 +760,7 @@ def application_plot(
             G_big=G_outages,
             attr=attr_map,
             label_rem_edges=True,
-            fontsize=24,
+            fontsize=20,
         )
         # colorbar
 
@@ -817,7 +818,6 @@ def application_plot(
 def main():
 
     print("Creating plots...")
-
     if not os.path.exists(plots_path):
         print(f"Creating directory {plots_path}...")
         os.makedirs(plots_path)
