@@ -1,7 +1,9 @@
 # Shapley Gets Power
 This project is licensed under the Mozilla Public License 2.0.
 
-This code coresponds to the paper #TODO: add reference.
+This code coresponds to the paper:
+S. Schreyer et al., "Attributing the Effects of Multiple Line Outages Via Shapley Values," 2026 8th Global Power, Energy and Communication Conference (GPECOM), Naples, Italy, 2026, pp. 502-507, doi: 10.1109/GPECOM70462.2026.11578602. keywords: {Indexes;Indexing;Load flow;Fluid flow;Printing;Equations;Planning;Approximation error;Monitoring;Terminology;Line Outage Distribution Factor;Maintenance Planning;Topology Optimization;Shapley values}
+
 Shapley gets Power uses shapley values to attribute power flow change in case of multiple outage scenarios.
 As an application example the Scandinavian transmission grid provided by PyPSA is studied. 
 An approximation scheme of the shapley value is introduced. 
